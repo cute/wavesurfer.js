@@ -84,7 +84,9 @@ export default class MediaElement extends WebAudio {
         media.controls = this.params.mediaControls;
         media.autoplay = this.params.autoplay || false;
         media.preload = preload == null ? 'auto' : preload;
-        media.src = url;
+        if (url.length) {
+            media.src = url;
+        }
         media.style.width = '100%';
 
         const prevMedia = container.querySelector(this.mediaType);
@@ -241,6 +243,9 @@ export default class MediaElement extends WebAudio {
      * @emits MediaElement#play
      */
     play(start, end) {
+        if (this.mediaUrl && this.mediaUrl != this.media.src) {
+            this.media.src = this.mediaUrl;
+        }
         this.seekTo(start);
         this.media.play();
         end && this.setPlayEnd(end);

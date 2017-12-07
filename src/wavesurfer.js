@@ -1217,7 +1217,12 @@ export default class WaveSurfer extends util.Observer {
         let url = urlOrElt;
 
         if (typeof urlOrElt === 'string') {
-            this.backend.load(url, this.mediaContainer, peaks, preload);
+            this.backend.mediaUrl = url;
+            if (peaks && duration) {
+                this.backend.load('', this.mediaContainer, peaks, preload);
+            } else {
+                this.backend.load(url, this.mediaContainer, peaks, preload);
+            }
         } else {
             const elt = urlOrElt;
             this.backend.loadElt(elt, peaks);
@@ -1229,7 +1234,9 @@ export default class WaveSurfer extends util.Observer {
 
         this.tmpEvents.push(
             this.backend.once('canplay', () => {
-                this.drawBuffer();
+                if (!peaks || !duration) {
+                    this.drawBuffer();
+                }
                 this.fireEvent('ready');
                 this.isReady = true;
             }),
@@ -1241,6 +1248,9 @@ export default class WaveSurfer extends util.Observer {
         // audio file and decode it with Web Audio.
         if (peaks) {
             this.backend.setPeaks(peaks, duration);
+            if (duration) {
+                this.drawBuffer();
+            }
         }
 
         if (
